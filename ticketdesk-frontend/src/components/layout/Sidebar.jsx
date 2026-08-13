@@ -13,7 +13,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../context/ThemeContext';
-import { RoleBadge } from '../common/RoleBadge';
 
 export const Sidebar = ({ mobileOpen, onCloseMobile }) => {
   const { user, logout } = useAuth();
@@ -26,6 +25,29 @@ export const Sidebar = ({ mobileOpen, onCloseMobile }) => {
   };
 
   const isAdmin = user?.role === 'ADMIN';
+
+  const getInitials = (u) => {
+    if (!u) return 'U';
+    if (u.firstName && u.lastName) {
+      return `${u.firstName[0]}${u.lastName[0]}`.toUpperCase();
+    }
+    if (u.fullName) {
+      const parts = u.fullName.trim().split(' ');
+      if (parts.length >= 2) {
+        return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+      }
+      return parts[0][0].toUpperCase();
+    }
+    if (u.username) return u.username[0].toUpperCase();
+    return 'U';
+  };
+
+  const getRoleLabel = (role) => {
+    if (role === 'ADMIN') return 'Administrator';
+    if (role === 'SUPPORT_ENGINEER' || role === 'SUPPORT') return 'Support Engineer';
+    if (role === 'EMPLOYEE') return 'Employee';
+    return role || 'User';
+  };
 
   return (
     <>
@@ -42,7 +64,7 @@ export const Sidebar = ({ mobileOpen, onCloseMobile }) => {
         } d-lg-flex`}
         style={{ width: '260px' }}
       >
-        {/* Brand Section */}
+        {/* Sidebar Brand Header */}
         <div className={`p-4 border-bottom d-flex align-items-center justify-content-between ${
           isDark ? 'border-slate-800' : 'border-slate-800'
         }`}>
@@ -63,28 +85,8 @@ export const Sidebar = ({ mobileOpen, onCloseMobile }) => {
           </button>
         </div>
 
-        {/* User Card inside Sidebar */}
-        {user && (
-          <div className="p-3 mx-3 my-3 bg-slate-800 rounded-3 border border-slate-700">
-            <div className="d-flex align-items-center gap-3">
-              <div
-                className="avatar bg-primary text-white rounded-circle fw-bold d-flex align-items-center justify-content-center shadow-sm"
-                style={{ width: 40, height: 40 }}
-              >
-                {user.firstName ? user.firstName[0].toUpperCase() : 'U'}
-              </div>
-              <div className="overflow-hidden">
-                <h6 className="fw-bold mb-0 text-white text-truncate">{user.fullName}</h6>
-                <div className="mt-1">
-                  <RoleBadge role={user.role} />
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Navigation Items */}
-        <div className="flex-grow-1 px-3 py-2 overflow-y-auto">
+        {/* Navigation Section */}
+        <div className="flex-grow-1 px-3 py-3 overflow-y-auto">
           <div className="text-2xs font-monospace text-slate-400 text-uppercase fw-semibold mb-2 px-3">
             Menu
           </div>
@@ -184,13 +186,35 @@ export const Sidebar = ({ mobileOpen, onCloseMobile }) => {
           </nav>
         </div>
 
-        {/* Footer Logout Button */}
-        <div className="p-3 border-top border-slate-800">
+        {/* Integrated Bottom Profile & Sign Out Footer */}
+        <div className="p-3 border-top border-slate-800 mt-auto">
+          {user && (
+            <div className="d-flex align-items-center gap-3 px-2 py-2 mb-2 rounded-3 hover-bg-slate-800 transition-all cursor-pointer">
+              <div className="position-relative">
+                <div
+                  className="avatar bg-primary text-white rounded-circle fw-bold d-flex align-items-center justify-content-center shadow-sm"
+                  style={{ width: 38, height: 38, fontSize: '14px' }}
+                >
+                  {getInitials(user)}
+                </div>
+                <span className="position-absolute bottom-0 end-0 p-1 bg-success border border-2 border-dark rounded-circle" />
+              </div>
+              <div className="overflow-hidden me-auto">
+                <h6 className="fw-semibold mb-0 text-white text-truncate text-sm lh-sm">
+                  {user.fullName || user.username}
+                </h6>
+                <span className="text-2xs text-slate-400 d-block text-truncate">
+                  {getRoleLabel(user.role)}
+                </span>
+              </div>
+            </div>
+          )}
+
           <button
             onClick={handleLogout}
-            className="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2 rounded-3 py-2 text-sm fw-semibold"
+            className="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2 rounded-3 py-2 text-xs fw-semibold transition-all"
           >
-            <LogOut size={16} /> Sign Out
+            <LogOut size={15} /> Sign Out
           </button>
         </div>
       </aside>
