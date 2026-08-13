@@ -12,10 +12,13 @@ import {
   X,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import { useTheme } from '../../context/ThemeContext';
 import { RoleBadge } from '../common/RoleBadge';
 
 export const Sidebar = ({ mobileOpen, onCloseMobile }) => {
   const { user, logout } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   const handleLogout = async () => {
     onCloseMobile();
@@ -34,12 +37,15 @@ export const Sidebar = ({ mobileOpen, onCloseMobile }) => {
       )}
 
       <aside
-        className={`sidebar bg-slate-900 text-white d-flex flex-column position-fixed top-0 start-0 vh-100 z-3 transition-all ${
+        className={`sidebar d-flex flex-column position-fixed top-0 start-0 vh-100 z-3 transition-all ${
           mobileOpen ? 'translate-x-0' : 'translate-x-mobile-hide'
         } d-lg-flex`}
         style={{ width: '260px' }}
       >
-        <div className="p-4 border-bottom border-slate-800 d-flex align-items-center justify-content-between">
+        {/* Brand Section */}
+        <div className={`p-4 border-bottom d-flex align-items-center justify-content-between ${
+          isDark ? 'border-slate-800' : 'border-slate-800'
+        }`}>
           <div className="d-flex align-items-center gap-2.5">
             <div className="bg-primary p-2 rounded-3 text-white shadow-sm d-flex align-items-center justify-content-center">
               <Headphones size={22} />
@@ -57,10 +63,14 @@ export const Sidebar = ({ mobileOpen, onCloseMobile }) => {
           </button>
         </div>
 
+        {/* User Card inside Sidebar */}
         {user && (
           <div className="p-3 mx-3 my-3 bg-slate-800 rounded-3 border border-slate-700">
             <div className="d-flex align-items-center gap-3">
-              <div className="avatar bg-primary text-white rounded-circle fw-bold d-flex align-items-center justify-content-center" style={{ width: 40, height: 40 }}>
+              <div
+                className="avatar bg-primary text-white rounded-circle fw-bold d-flex align-items-center justify-content-center shadow-sm"
+                style={{ width: 40, height: 40 }}
+              >
                 {user.firstName ? user.firstName[0].toUpperCase() : 'U'}
               </div>
               <div className="overflow-hidden">
@@ -73,6 +83,7 @@ export const Sidebar = ({ mobileOpen, onCloseMobile }) => {
           </div>
         )}
 
+        {/* Navigation Items */}
         <div className="flex-grow-1 px-3 py-2 overflow-y-auto">
           <div className="text-2xs font-monospace text-slate-400 text-uppercase fw-semibold mb-2 px-3">
             Menu
@@ -173,6 +184,7 @@ export const Sidebar = ({ mobileOpen, onCloseMobile }) => {
           </nav>
         </div>
 
+        {/* Footer Logout Button */}
         <div className="p-3 border-top border-slate-800">
           <button
             onClick={handleLogout}

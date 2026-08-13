@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { useTheme } from '../../context/ThemeContext';
 import { Footer } from './Footer';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
@@ -7,6 +8,8 @@ import { Sidebar } from './Sidebar';
 export const MainLayout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   const getPageTitle = () => {
     const path = location.pathname;
@@ -20,7 +23,7 @@ export const MainLayout = () => {
   };
 
   return (
-    <div className="d-flex min-vh-100 bg-slate-50">
+    <div className={`d-flex min-vh-100 transition-all ${isDark ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
       <Sidebar mobileOpen={mobileOpen} onCloseMobile={() => setMobileOpen(false)} />
       <div className="main-content-wrapper flex-grow-1 d-flex flex-column min-vh-100">
         <Header onToggleMobileSidebar={() => setMobileOpen(!mobileOpen)} title={getPageTitle()} />
