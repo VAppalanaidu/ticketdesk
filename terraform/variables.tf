@@ -13,7 +13,7 @@ variable "aws_account_id" {
 variable "git_commit_sha" {
   description = "Git commit SHA tag for ECR image"
   type        = string
-  default     = "a6ea7fd"
+  default     = "b0854f0"
 }
 
 variable "project_tag" {
