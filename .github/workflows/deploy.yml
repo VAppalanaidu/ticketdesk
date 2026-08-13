@@ -1,0 +1,77 @@
+name: TicketDesk CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  build-test-and-deploy:
+    name: Build, Test & Deploy to AWS ECS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run Backend Tests
+        run: |
+          cd ticketdesk-backend
+          mvn test -DskipTests=false
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, Tag and Push Docker Image to ECR
+        env:
+          ECR_REGISTRY: 420151437872.dkr.ecr.ap-south-1.amazonaws.com
+          ECR_REPOSITORY: ticketdesk-backend
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          cd ticketdesk-backend
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Deploy to ECS Fargate Service
+        run: |
+          aws ecs update-service \
+            --cluster ticketdesk-ecs-cluster \
+            --service ticketdesk-backend-service \
+            --force-new-deployment \
+            --region ap-south-1
+
+      - name: Run Smoke Test against Live ALB Endpoint
+        run: |
+          echo "Waiting 60s for ECS deployment..."
+          sleep 60
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://ticketdesk-alb-359273091.ap-south-1.elb.amazonaws.com/api/v1/actuator/health)
+          echo "Actuator status code: $STATUS"
+          if [ "$STATUS" -ne 200 ]; then
+            echo "Smoke test failed! Expected 200, got $STATUS"
+            exit 1
+          fi
+          echo "Smoke test passed successfully!"
