@@ -5,6 +5,7 @@ import { Eye, EyeOff, UserPlus } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
+import { useTheme } from '../../context/ThemeContext';
 import {
   EMAIL_REGEX,
   evaluatePasswordStrength,
@@ -15,6 +16,9 @@ import {
 
 export const RegisterPage = () => {
   const { register: registerAuth, isLoading } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -72,20 +76,34 @@ export const RegisterPage = () => {
     setValue('phone', sanitized, { shouldValidate: touchedFields.phone });
   };
 
+  const inputClass = `text-xs py-2 shadow-none ${
+    isDark
+      ? 'bg-slate-900 text-white border-slate-700 placeholder-slate-500'
+      : 'bg-slate-50 text-slate-900 border-slate-300 placeholder-slate-400'
+  }`;
+
+  const labelClass = `fw-semibold text-2xs ${isDark ? 'text-slate-300' : 'text-slate-700'}`;
+
   return (
-    <Card className="border-0 shadow-2xl rounded-4 bg-slate-950 text-white border border-slate-800 p-3 my-3">
+    <Card className={`border rounded-4 p-3 my-3 shadow-lg transition-all ${
+      isDark ? 'bg-slate-800 text-white border-slate-700' : 'bg-white text-slate-900 border-slate-200 shadow-sm'
+    }`}>
       <Card.Body className="p-2">
         {/* Form Header */}
         <div className="text-center mb-4">
           <div className="d-inline-flex p-3 bg-primary bg-opacity-10 text-primary rounded-circle mb-2 border border-primary border-opacity-20 shadow-sm">
             <UserPlus size={28} />
           </div>
-          <h4 className="fw-bold text-white mb-1 tracking-tight">Create Employee Account</h4>
-          <p className="text-slate-400 text-xs mb-0">Fill out your details to join the IT Support Workspace</p>
+          <h4 className={`fw-bold mb-1 tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            Create Employee Account
+          </h4>
+          <p className={`text-xs mb-0 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            Fill out your details to join the IT Support Workspace
+          </p>
         </div>
 
         {serverError && (
-          <Alert variant="danger" className="text-xs p-2.5 rounded-3 mb-3 border-0 bg-danger bg-opacity-20 text-danger">
+          <Alert variant="danger" className="text-xs p-2.5 rounded-3 mb-3 border-0 bg-danger bg-opacity-15 text-danger">
             {serverError}
           </Alert>
         )}
@@ -95,7 +113,7 @@ export const RegisterPage = () => {
           <div className="row g-2 mb-2">
             <div className="col-6">
               <Form.Group>
-                <Form.Label className="fw-semibold text-2xs text-slate-300">
+                <Form.Label className={labelClass}>
                   First Name <span className="text-danger">*</span>
                 </Form.Label>
                 <Form.Control
@@ -108,7 +126,7 @@ export const RegisterPage = () => {
                     setValueAs: (v) => v.trim(),
                   })}
                   isInvalid={!!errors.firstName && touchedFields.firstName}
-                  className="bg-slate-900 text-white border-slate-700 placeholder-slate-500 text-xs py-2 shadow-none"
+                  className={inputClass}
                 />
                 <Form.Control.Feedback type="invalid" className="text-2xs">
                   {errors.firstName?.message}
@@ -117,7 +135,7 @@ export const RegisterPage = () => {
             </div>
             <div className="col-6">
               <Form.Group>
-                <Form.Label className="fw-semibold text-2xs text-slate-300">
+                <Form.Label className={labelClass}>
                   Last Name <span className="text-danger">*</span>
                 </Form.Label>
                 <Form.Control
@@ -130,7 +148,7 @@ export const RegisterPage = () => {
                     setValueAs: (v) => v.trim(),
                   })}
                   isInvalid={!!errors.lastName && touchedFields.lastName}
-                  className="bg-slate-900 text-white border-slate-700 placeholder-slate-500 text-xs py-2 shadow-none"
+                  className={inputClass}
                 />
                 <Form.Control.Feedback type="invalid" className="text-2xs">
                   {errors.lastName?.message}
@@ -143,7 +161,7 @@ export const RegisterPage = () => {
           <div className="row g-2 mb-2">
             <div className="col-6">
               <Form.Group>
-                <Form.Label className="fw-semibold text-2xs text-slate-300">
+                <Form.Label className={labelClass}>
                   Username <span className="text-danger">*</span>
                 </Form.Label>
                 <Form.Control
@@ -159,7 +177,7 @@ export const RegisterPage = () => {
                     setValueAs: (v) => v.trim(),
                   })}
                   isInvalid={!!errors.username && touchedFields.username}
-                  className="bg-slate-900 text-white border-slate-700 placeholder-slate-500 text-xs py-2 shadow-none"
+                  className={inputClass}
                 />
                 <Form.Control.Feedback type="invalid" className="text-2xs">
                   {errors.username?.message}
@@ -168,7 +186,7 @@ export const RegisterPage = () => {
             </div>
             <div className="col-6">
               <Form.Group>
-                <Form.Label className="fw-semibold text-2xs text-slate-300">
+                <Form.Label className={labelClass}>
                   Email Address <span className="text-danger">*</span>
                 </Form.Label>
                 <Form.Control
@@ -183,7 +201,7 @@ export const RegisterPage = () => {
                     setValueAs: (v) => v.trim(),
                   })}
                   isInvalid={!!errors.email && touchedFields.email}
-                  className="bg-slate-900 text-white border-slate-700 placeholder-slate-500 text-xs py-2 shadow-none"
+                  className={inputClass}
                 />
                 <Form.Control.Feedback type="invalid" className="text-2xs">
                   {errors.email?.message}
@@ -196,11 +214,11 @@ export const RegisterPage = () => {
           <div className="row g-2 mb-2">
             <div className="col-6">
               <Form.Group>
-                <Form.Label className="fw-semibold text-2xs text-slate-300">
+                <Form.Label className={labelClass}>
                   Phone Number <span className="text-danger">*</span>
                 </Form.Label>
                 <InputGroup hasValidation>
-                  <InputGroup.Text className="bg-slate-900 border-slate-700 text-slate-400 text-xs px-2">
+                  <InputGroup.Text className={`text-xs px-2 ${isDark ? 'bg-slate-900 border-slate-700 text-slate-400' : 'bg-slate-100 border-slate-300 text-slate-600'}`}>
                     +91
                   </InputGroup.Text>
                   <Form.Control
@@ -213,7 +231,7 @@ export const RegisterPage = () => {
                     })}
                     onChange={handlePhoneChange}
                     isInvalid={!!errors.phone && touchedFields.phone}
-                    className="bg-slate-900 text-white border-slate-700 placeholder-slate-500 text-xs py-2 shadow-none font-monospace"
+                    className={`${inputClass} font-monospace`}
                   />
                   <Form.Control.Feedback type="invalid" className="text-2xs">
                     {errors.phone?.message}
@@ -224,12 +242,12 @@ export const RegisterPage = () => {
 
             <div className="col-6">
               <Form.Group>
-                <Form.Label className="fw-semibold text-2xs text-slate-300">Department</Form.Label>
+                <Form.Label className={labelClass}>Department</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="IT, Finance, HR..."
                   {...register('department')}
-                  className="bg-slate-900 text-white border-slate-700 placeholder-slate-500 text-xs py-2 shadow-none"
+                  className={inputClass}
                 />
               </Form.Group>
             </div>
@@ -237,7 +255,7 @@ export const RegisterPage = () => {
 
           {/* Password */}
           <Form.Group className="mb-2">
-            <Form.Label className="fw-semibold text-2xs text-slate-300">
+            <Form.Label className={labelClass}>
               Password <span className="text-danger">*</span>
             </Form.Label>
             <InputGroup hasValidation>
@@ -254,11 +272,11 @@ export const RegisterPage = () => {
                   },
                 })}
                 isInvalid={!!errors.password && touchedFields.password}
-                className="bg-slate-900 text-white border-slate-700 placeholder-slate-500 text-xs py-2 shadow-none"
+                className={inputClass}
               />
               <Button
-                variant="outline-secondary"
-                className="border-slate-700 text-slate-400 bg-slate-900"
+                variant={isDark ? 'outline-secondary' : 'light'}
+                className={isDark ? 'border-slate-700 text-slate-400 bg-slate-900' : 'border-slate-300 text-slate-600 bg-slate-100'}
                 onClick={() => setShowPassword(!showPassword)}
                 tabIndex={-1}
               >
@@ -273,14 +291,14 @@ export const RegisterPage = () => {
             {passwordVal && (
               <div className="mt-1.5">
                 <div className="d-flex justify-content-between align-items-center text-2xs mb-1">
-                  <span className="text-slate-400">Password Strength:</span>
+                  <span className={isDark ? 'text-slate-400' : 'text-slate-500'}>Password Strength:</span>
                   <span className={`fw-bold text-${passStrength.variant}`}>{passStrength.label}</span>
                 </div>
                 <ProgressBar
                   now={passStrength.percent}
                   variant={passStrength.variant}
                   style={{ height: '4px' }}
-                  className="bg-slate-800"
+                  className={isDark ? 'bg-slate-900' : 'bg-slate-200'}
                 />
               </div>
             )}
@@ -288,7 +306,7 @@ export const RegisterPage = () => {
 
           {/* Confirm Password */}
           <Form.Group className="mb-3">
-            <Form.Label className="fw-semibold text-2xs text-slate-300">
+            <Form.Label className={labelClass}>
               Confirm Password <span className="text-danger">*</span>
             </Form.Label>
             <Form.Control
@@ -299,7 +317,7 @@ export const RegisterPage = () => {
                 validate: (val) => val === passwordVal || 'Passwords do not match.',
               })}
               isInvalid={!!errors.confirmPassword && touchedFields.confirmPassword}
-              className="bg-slate-900 text-white border-slate-700 placeholder-slate-500 text-xs py-2 shadow-none"
+              className={inputClass}
             />
             <Form.Control.Feedback type="invalid" className="text-2xs">
               {errors.confirmPassword?.message}
@@ -310,13 +328,13 @@ export const RegisterPage = () => {
             type="submit"
             variant="primary"
             disabled={isLoading}
-            className="w-100 py-2.5 rounded-3 fw-bold shadow-lg mt-2 text-sm d-flex align-items-center justify-content-center gap-2"
+            className="w-100 py-2.5 rounded-3 fw-bold shadow-sm mt-2 text-sm d-flex align-items-center justify-content-center gap-2"
           >
             <UserPlus size={18} /> {isLoading ? 'Creating Account...' : 'Complete Registration'}
           </Button>
         </Form>
 
-        <div className="mt-3 text-center border-top border-slate-800 pt-2 text-xs text-slate-400">
+        <div className={`mt-3 text-center border-top pt-2 text-xs ${isDark ? 'border-slate-700 text-slate-400' : 'border-slate-200 text-slate-600'}`}>
           Already have an account?{' '}
           <Link to="/login" className="text-primary fw-semibold text-decoration-none hover-underline">
             Sign In

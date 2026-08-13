@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Alert, Badge, Button, Card, Form, InputGroup } from 'react-bootstrap';
-import { Eye, EyeOff, Headphones, Key, Lock, LogIn, Mail, Shield, User } from 'lucide-react';
+import { Alert, Button, Card, Form, InputGroup } from 'react-bootstrap';
+import { Eye, EyeOff, Headphones, Lock, LogIn, User } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../../hooks/useAuth';
+import { useTheme } from '../../context/ThemeContext';
 
 export const LoginPage = () => {
   const { login, isLoading } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -47,25 +51,33 @@ export const LoginPage = () => {
   };
 
   return (
-    <Card className="border-0 shadow-2xl rounded-4 bg-slate-950 text-white border border-slate-800 p-4">
+    <Card className={`border rounded-4 p-4 shadow-lg transition-all ${
+      isDark
+        ? 'bg-slate-800 text-white border-slate-700'
+        : 'bg-white text-slate-900 border-slate-200 shadow-sm'
+    }`}>
       <Card.Body className="p-2">
         {/* Form Header */}
         <div className="text-center mb-4">
           <div className="d-inline-flex p-3 bg-primary bg-opacity-10 text-primary rounded-circle mb-3 border border-primary border-opacity-20 shadow-sm">
-            <Headphones size={32} />
+            <Headphones size={28} />
           </div>
-          <h4 className="fw-bold text-white mb-1 tracking-tight">Sign In to TicketDesk</h4>
-          <p className="text-slate-400 text-xs mb-0">Enter your credentials to access your support workspace</p>
+          <h4 className={`fw-bold mb-1 tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            Sign In to TicketDesk
+          </h4>
+          <p className={`text-xs mb-0 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            Enter your credentials to access your support workspace
+          </p>
         </div>
 
         {sessionExpired && (
-          <Alert variant="warning" className="text-xs p-2.5 rounded-3 mb-3 border-0 bg-warning bg-opacity-20 text-warning">
+          <Alert variant="warning" className="text-xs p-2.5 rounded-3 mb-3 border-0 bg-warning bg-opacity-15 text-warning">
             Your session has expired. Please sign in again.
           </Alert>
         )}
 
         {serverError && (
-          <Alert variant="danger" className="text-xs p-2.5 rounded-3 mb-3 border-0 bg-danger bg-opacity-20 text-danger">
+          <Alert variant="danger" className="text-xs p-2.5 rounded-3 mb-3 border-0 bg-danger bg-opacity-15 text-danger">
             {serverError}
           </Alert>
         )}
@@ -73,22 +85,26 @@ export const LoginPage = () => {
         <Form onSubmit={handleSubmit(onSubmit)} noValidate>
           {/* Username / Email Field */}
           <Form.Group className="mb-3">
-            <Form.Label className="fw-semibold text-xs text-slate-300 d-flex justify-content-between">
+            <Form.Label className={`fw-semibold text-xs d-flex justify-content-between ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
               <span>Username or Email <span className="text-danger">*</span></span>
             </Form.Label>
             <InputGroup hasValidation>
-              <InputGroup.Text className="bg-slate-900 border-slate-700 text-slate-400">
+              <InputGroup.Text className={`border-end-0 ${isDark ? 'bg-slate-900 border-slate-700 text-slate-400' : 'bg-slate-100 border-slate-300 text-slate-500'}`}>
                 <User size={18} />
               </InputGroup.Text>
               <Form.Control
                 type="text"
-                placeholder="e.g. admin or john.doe@company.com"
+                placeholder="e.g. admin or admin@ticketdesk.com"
                 {...register('usernameOrEmail', {
                   required: 'Username or email is required.',
                   minLength: { value: 3, message: 'Must be at least 3 characters.' },
                 })}
                 isInvalid={!!errors.usernameOrEmail && touchedFields.usernameOrEmail}
-                className="bg-slate-900 text-white border-slate-700 placeholder-slate-500 shadow-none text-sm"
+                className={`border-start-0 text-sm shadow-none ${
+                  isDark
+                    ? 'bg-slate-900 text-white border-slate-700 placeholder-slate-500'
+                    : 'bg-slate-50 text-slate-900 border-slate-300 placeholder-slate-400'
+                }`}
               />
               <Form.Control.Feedback type="invalid" className="text-2xs mt-1">
                 {errors.usernameOrEmail?.message}
@@ -99,15 +115,12 @@ export const LoginPage = () => {
           {/* Password Field */}
           <Form.Group className="mb-3">
             <div className="d-flex justify-content-between align-items-center mb-1">
-              <Form.Label className="fw-semibold text-xs text-slate-300 mb-0">
+              <Form.Label className={`fw-semibold text-xs mb-0 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                 Password <span className="text-danger">*</span>
               </Form.Label>
-              <Link to="/forgot-password" className="text-2xs text-primary text-decoration-none hover-underline">
-                Forgot password?
-              </Link>
             </div>
             <InputGroup hasValidation>
-              <InputGroup.Text className="bg-slate-900 border-slate-700 text-slate-400">
+              <InputGroup.Text className={`border-end-0 ${isDark ? 'bg-slate-900 border-slate-700 text-slate-400' : 'bg-slate-100 border-slate-300 text-slate-500'}`}>
                 <Lock size={18} />
               </InputGroup.Text>
               <Form.Control
@@ -117,11 +130,15 @@ export const LoginPage = () => {
                   required: 'Password is required.',
                 })}
                 isInvalid={!!errors.password && touchedFields.password}
-                className="bg-slate-900 text-white border-slate-700 placeholder-slate-500 shadow-none text-sm"
+                className={`border-start-0 border-end-0 text-sm shadow-none ${
+                  isDark
+                    ? 'bg-slate-900 text-white border-slate-700 placeholder-slate-500'
+                    : 'bg-slate-50 text-slate-900 border-slate-300 placeholder-slate-400'
+                }`}
               />
               <Button
-                variant="outline-secondary"
-                className="border-slate-700 text-slate-400 bg-slate-900"
+                variant={isDark ? 'outline-secondary' : 'light'}
+                className={`border-start-0 ${isDark ? 'border-slate-700 text-slate-400 bg-slate-900' : 'border-slate-300 text-slate-600 bg-slate-100'}`}
                 onClick={() => setShowPassword(!showPassword)}
                 tabIndex={-1}
               >
@@ -137,15 +154,17 @@ export const LoginPage = () => {
             type="submit"
             variant="primary"
             disabled={isLoading}
-            className="w-100 py-2.5 rounded-3 fw-bold shadow-lg mt-3 d-flex align-items-center justify-content-center gap-2"
+            className="w-100 py-2.5 rounded-3 fw-bold shadow-sm mt-3 d-flex align-items-center justify-content-center gap-2"
           >
             <LogIn size={18} /> {isLoading ? 'Signing In...' : 'Sign In'}
           </Button>
         </Form>
 
         {/* Demo Credentials Section */}
-        <div className="mt-4 pt-3 border-top border-slate-800">
-          <span className="text-2xs text-slate-400 font-monospace text-uppercase fw-semibold d-block text-center mb-2">
+        <div className={`mt-4 pt-3 border-top ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
+          <span className={`text-2xs font-monospace text-uppercase fw-semibold d-block text-center mb-2 ${
+            isDark ? 'text-slate-400' : 'text-slate-500'
+          }`}>
             Demo Accounts (Click to Auto-fill)
           </span>
           <div className="d-flex flex-wrap justify-content-center gap-1.5">
@@ -176,7 +195,7 @@ export const LoginPage = () => {
           </div>
         </div>
 
-        <div className="mt-4 pt-2 text-center text-xs text-slate-400">
+        <div className={`mt-4 pt-2 text-center text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
           Don't have an account?{' '}
           <Link to="/register" className="text-primary fw-semibold text-decoration-none hover-underline">
             Create an account
