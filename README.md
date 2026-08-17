@@ -1,6 +1,6 @@
 # Project TicketDesk — AWS Capstone POC Complete Deployment Guide
 
-> **Level**: Foundation (Freshers) | **Stream**: Java (Spring Boot) + React Vite  
+> **Level**: Foundation | **Stream**: Java (Spring Boot) + React Vite  
 > **Region**: `ap-south-1` (Mumbai) | **AWS Account ID**: `420151437872`  
 > **Goal**: Deploy a working IT support ticket application repeatably on AWS from code.
 
